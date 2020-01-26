@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+  api:
+    container_name: api
+    build:
+      context: ..
+      dockerfile: ./devops/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: wsgi.py
+      FLASK_ENV: development
+      SQLALCHEMY_DATABASE_URI: postgresql://birthdays@postgres/birthdays
+      SQLALCHEMY_TRACK_MODIFICATIONS: "False"
+      SQLALCHEMY_ECHO: "True"
+    # volumes:
+    #   - type: bind
+    #     source: ../api
+    #     target: /usr/src/app
+  postgres:
+    container_name: postgres
+    image: postgres:11.6
+    ports:
+      - "5432:5432"
+    environment:
+      # Recommended to put in a subdirectory when data directory is mounted (e.g. persistent disk)
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - "./postgres:/docker-entrypoint-initdb.d"
+      - "postgres-data:/var/lib/postgresql/data/pgdata"
+volumes:
+  postgres-data:
+    name: postgres-data
